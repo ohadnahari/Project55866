@@ -93,7 +93,7 @@ def fill_missing_numerical_values(df):
         if df[column].dtype == 'float64' or df[column].dtype == 'int64':
             mean = find_mean_of_column(df, column).round()
             df_c[column].fillna(mean, inplace=True)
-    # df_c.to_csv('customers_full_numbers.csv')
+    # df_c.to_csv('customers_full_numbers.csv', index=False)
     return df_c
 
 def fill_missing_categorical_values(df):
@@ -108,7 +108,7 @@ def fill_missing_categorical_values(df):
         if df[column].dtype == 'object':
             mode = find_mode_of_column(df, column)
             df_c[column].fillna(mode, inplace=True)
-    # df_c.to_csv('customers_full_categorical.csv')
+    # df_c.to_csv('customers_full_categorical.csv', index=False)
     return df_c
 
 def fill_all_missing_values(df):
@@ -120,7 +120,7 @@ def fill_all_missing_values(df):
     df_c = df.copy()
     df_c = fill_missing_numerical_values(df_c)
     df_c = fill_missing_categorical_values(df_c)
-    df_c.to_csv('customers_copy.csv')
+    df_c.to_csv('customers_copy.csv', index=False)
     return df_c
 
 
