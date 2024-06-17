@@ -58,11 +58,16 @@ def find_mode_of_column(df, column_name):
     :param column_name:
     :return:
     """
-    mode = df[column_name].mode()
+    mode = df[column_name].mode()[0]
     return mode
 
 
 def create_dict_of_mean_median_mode(df):
+    """
+    create a dictionary of the mean, median, and mode of each column
+    :param df:
+    :return:
+    """
     column_names = df.columns.tolist()
     dict_of_mean_median_mode = {}
     for column in column_names:
@@ -71,7 +76,54 @@ def create_dict_of_mean_median_mode(df):
             median = find_median_of_column(df, column)
             mode = find_mode_of_column(df, column)
             dict_of_mean_median_mode[column] = {'mean': mean, 'median': median, 'mode': mode}
+        else:
+            mode = find_mode_of_column(df, column)
+            dict_of_mean_median_mode[column] = { 'mode': mode}
     return dict_of_mean_median_mode
+
+def fill_missing_numerical_values(df):
+    """
+    fill the missing values with the mean of the column
+    :param df:
+    :return:
+    """
+    df_c = df.copy()
+    column_names = df.columns.tolist()
+    for column in column_names:
+        if df[column].dtype == 'float64' or df[column].dtype == 'int64':
+            mean = find_mean_of_column(df, column).round()
+            df_c[column].fillna(mean, inplace=True)
+    # df_c.to_csv('customers_full_numbers.csv')
+    return df_c
+
+def fill_missing_categorical_values(df):
+    """
+    fill the missing values with the mode of the column
+    :param df:
+    :return:
+    """
+    df_c = df.copy()
+    column_names = df.columns.tolist()
+    for column in column_names:
+        if df[column].dtype == 'object':
+            mode = find_mode_of_column(df, column)
+            df_c[column].fillna(mode, inplace=True)
+    # df_c.to_csv('customers_full_categorical.csv')
+    return df_c
+
+def fill_all_missing_values(df):
+    """
+    fill all missing values in the dataset
+    :param df:
+    :return:
+    """
+    df_c = df.copy()
+    df_c = fill_missing_numerical_values(df_c)
+    df_c = fill_missing_categorical_values(df_c)
+    df_c.to_csv('customers_copy.csv')
+    return df_c
+
+
 
 
 def main():
@@ -84,9 +136,13 @@ def main():
     #         # print(df[column].describe())
     #         print(find_mean_of_column(df, column))
     # print(all_columns_names(df))
-    check_data_type(df)
+    # check_data_type(df)
     # print(is_loyalty_years_smaller_than_age(df))
     # print(df.info)
+    # print(fill_missing_numerical_values(df))
+    # print(find_mode_of_column(df, "Location"))
+    # print(fill_missing_categorical_values(df))
+    fill_all_missing_values(df)
 
 
 if __name__ == "__main__":
