@@ -11,8 +11,8 @@ import pandas as pd
 # we will fill the missing values with the mean of the column (for Age and LoyaltyYears, and more)
 
 
-def open_data():
-    df = pd.read_csv('./customers_annual_spending_dataset.csv')
+def open_data(path):
+    df = pd.read_csv(path)
     return df
 
 
@@ -127,7 +127,9 @@ def fill_all_missing_values(df):
 
 
 def main():
-    df = open_data()
+    # original_path = './customers_annual_spending_dataset.csv'
+    new_csv_path = './customers_copy.csv'
+    df = open_data(new_csv_path)
     # print(create_dict_of_mean_median_mode(df))
     # for column in df.columns:
     #     if df[column].dtype == 'float64' or df[column].dtype == 'int64':
@@ -142,7 +144,7 @@ def main():
     # print(fill_missing_numerical_values(df))
     # print(find_mode_of_column(df, "Location"))
     # print(fill_missing_categorical_values(df))
-    fill_all_missing_values(df)
+    # fill_all_missing_values(df)
 
 
 if __name__ == "__main__":
