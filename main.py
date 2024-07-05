@@ -1,24 +1,13 @@
+import numpy as np
 import pandas as pd
+import statistics
 
-# the first assignment is: Data Exploration: a. Load the dataset and perform an initial exploration to understand its
-# structure, data types, and summary statistics. b. Identify any missing values, outliers, or inconsistencies in the
-# data. Apply appropriate preprocessing techniques to handle these issues.
 
-#  for inconsistency, we can use the following code to check the data type of each column.
-# also we can make sure that LoyaltyYears is smaller than Age
-
-# for missing values, we can use the following code to check the missing values in the dataset
-# we will fill the missing values with the mean of the column (for Age and LoyaltyYears, and more)
 
 
 def open_data(path):
     df = pd.read_csv(path)
     return df
-
-
-def all_columns_names(df):
-    column_names = df.columns.tolist()
-    return column_names
 
 
 def check_data_type(df):
@@ -35,10 +24,18 @@ def find_missing_values(df):
 
 
 def is_loyalty_years_smaller_than_age(df):
-    # check if LoyaltyYears is smaller than Age
-    loyalty_and_age = df[df['LoyaltyYears'].values < df['Age'].values]
-    broken_loyalty_and_age = df[df['LoyaltyYears'].values >= df['Age'].values]
-    return loyalty_and_age, broken_loyalty_and_age
+    broken_loyalty_and_age = df[df['LoyaltyYears'].values > df['Age'].values]
+    lst = [val for val in broken_loyalty_and_age['RecordNumber']]
+    return lst
+
+
+def positive_column(df, column_name):
+    vals = df[column_name].values
+    negative_indices = np.where(vals < 0)[0]
+    if negative_indices.size > 0:
+        lst = [val for val in negative_indices]
+        return lst
+    return True
 
 
 def find_mean_of_column(df, column_name):
@@ -137,7 +134,6 @@ def main():
     #         # print(column)
     #         # print(df[column].describe())
     #         print(find_mean_of_column(df, column))
-    # print(all_columns_names(df))
     # check_data_type(df)
     # print(is_loyalty_years_smaller_than_age(df))
     # print(df.info)
@@ -148,4 +144,22 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    df = open_data("C:\\Users\\noIDp\\Documents\\GitHub\\Project55866\\customers_annual_spending_dataset.csv").copy()
+
+    print(is_loyalty_years_smaller_than_age(df))
+    print(positive_column(df, 'AnnualSpending'))
+
+    # CV calculations
+    # col_names = df.columns.tolist()
+    # for col in col_names:
+    #     if df[col].dtype == 'float64' or df[col].dtype == 'int64':
+    #         if col in ['Unnamed: 0', 'RecordNumber', 'CustomerId', 'AnnualSpending', 'HasCreditCard', 'ActiveStatus', 'HasComplaint']:
+    #             continue
+    #         df = df.dropna(subset=[col])
+    #         mean = find_mean_of_column(df, col)
+    #         std = statistics.stdev(df[col])
+    #         median = find_median_of_column(df, col)
+    #         print(f"the CV of {col} is: {round(std/mean, 3)}")
+    #     else:
+    #         print(f"{col} is non-numerical")
