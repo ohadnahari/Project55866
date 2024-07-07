@@ -64,7 +64,7 @@ def statistics_dictionary(dataframe):
             median = find_median_of_column(dataframe, column)
             mode = find_mode_of_column(dataframe, column)
             std = statistics.stdev(dataframe[column])
-            cv = round(std/mean, 2)
+            cv = round(std / mean, 2)
             min_obs = dataframe[column].min()
             max_obs = dataframe[column].max()
             observations = len(dataframe[column])
@@ -90,12 +90,23 @@ def statistics_dictionary(dataframe):
 
 
 def is_loyalty_years_smaller_than_age(dataframe):
+    """
+    find the rows where the loyalty years are greater than the age
+    :param dataframe:
+    :return: list of record numbers where the loyalty years are greater than the age
+    """
     broken_loyalty_and_age = dataframe[dataframe['LoyaltyYears'].values > dataframe['Age'].values]
     lst = [val for val in broken_loyalty_and_age['RecordNumber']]
     return lst
 
 
 def positive_column(dataframe, column_name):
+    """
+    find the rows where the column has negative values
+    :param dataframe:
+    :param column_name:
+    :return: true if there are no negative values, otherwise a list of record numbers where the column has negative values
+    """
     vals = dataframe[column_name].values
     negative_indices = np.where(vals < 0)[0]
     if negative_indices.size > 0:
@@ -144,6 +155,12 @@ def fill_all_missing_values(dataframe):
 
 
 def encode_data(dataframe, cols: list[str]):
+    """
+    encode the categorical columns
+    :param dataframe:
+    :param cols:
+    :return:
+    """
     for col in cols:
         unique_vals = dataframe[col].unique()
         unique_dict = {item: ind for ind, item in enumerate(unique_vals)}
@@ -152,6 +169,12 @@ def encode_data(dataframe, cols: list[str]):
 
 
 def del_rows(dataframe, row_indices: list[int]):
+    """
+    delete the rows from the dataframe
+    :param dataframe:
+    :param row_indices:
+    :return:
+    """
     dataframe = dataframe.drop(row_indices, inplace=True)
     return dataframe
 
@@ -162,6 +185,12 @@ def del_rows(dataframe, row_indices: list[int]):
 
 
 def perform_linear_regression(dataframe, training_set_fraction=0.7):
+    """
+    perform linear regression on the dataset
+    :param dataframe:
+    :param training_set_fraction:
+    :return: plot with regression line and y=x line
+    """
     dataframe = dataframe.drop(columns=["LastName", "RecordNumber", "CustomerId"])
     x = dataframe.drop(columns=["AnnualSpending"])
     y = dataframe["AnnualSpending"]
@@ -181,6 +210,9 @@ def perform_linear_regression(dataframe, training_set_fraction=0.7):
     results = smf_model.fit()
     y_predicted = results.predict(x_test)
 
+    # Show the summary of the statsmodels linear regression
+    print(results.summary())
+
     # Plot
     plt.scatter(y_test, y_predicted)
     plt.xlabel('actual data'), plt.ylabel('predicted data')
@@ -195,8 +227,9 @@ def perform_linear_regression(dataframe, training_set_fraction=0.7):
     regression_line = regression_slope * np.array(lims) + regression_intercept
     plt.plot(lims, regression_line, 'b-', alpha=0.75, label='Regression Line')
 
-    # Adding a legend and showing the plot
+    # Adding a legend, title and showing the plot
     plt.legend()
+    plt.title("Linear Regression Model Predicting Annual Spending")
     plt.show()
 
 
@@ -206,6 +239,12 @@ def perform_linear_regression(dataframe, training_set_fraction=0.7):
 
 
 def turn_col_to_binary(dataframe, col_name):
+    """
+    turn the column into a binary column, depending on whether the value is greater than the mean
+    :param dataframe:
+    :param col_name:
+    :return:
+    """
     new_df = dataframe.copy()
     mean = dataframe[col_name].mean()
     new_df[col_name] = (new_df[col_name] >= mean).astype(int)
@@ -213,6 +252,12 @@ def turn_col_to_binary(dataframe, col_name):
 
 
 def split_log_regression(dataframe, training_set_frac):
+    """
+    split the data into training and test sets
+    :param dataframe:
+    :param training_set_frac:
+    :return:
+    """
     random_rows = np.random.rand(len(dataframe)) < training_set_frac
     data_train = dataframe[random_rows]
     data_test = dataframe[~random_rows]
@@ -220,6 +265,12 @@ def split_log_regression(dataframe, training_set_frac):
 
 
 def initiate_log_regression(train_data, test_data):
+    """
+    perform logistic regression on the dataset, print evaluation metrics, show confusion matrix
+    :param train_data:
+    :param test_data:
+    :return:
+    """
     # part 1 - perform logistic regression
     lr = LogisticRegression(solver='lbfgs', max_iter=10000)
     scaler = StandardScaler()
@@ -255,10 +306,15 @@ def initiate_log_regression(train_data, test_data):
     sns.heatmap(cm, annot=True, fmt="d", annot_kws={"size": 16})
     plt.xlabel('Predicted Label')
     plt.ylabel('True Label')
+    plt.title("Confusion Matrix for Logistic Regression Model")
     plt.show()
 
 
 def main():
+    """
+    main function to run all of the above
+    :return:
+    """
     df = pd.read_csv("customers_annual_spending_dataset.csv").copy()
 
     # phase 1 - data validation
